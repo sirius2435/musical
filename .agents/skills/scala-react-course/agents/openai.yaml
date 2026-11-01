@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scala / React 课程开发规范 V2"
+  short_description: "按课程原文及 V2 语言要求编写与审查前后端代码，追溯来源和验证结果"
+  default_prompt: "使用 $scala-react-course，按任务语言先读取 V2 相关规范，遵守原始 60 条规则并说明实际验证结果。"

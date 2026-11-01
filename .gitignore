@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.runtime/
+frontend/node_modules
+frontend/dist/
+frontend/.cache/
+backend/target/
+backend/project/target/
+backend/project/project/
+__pycache__/
+*.pyc

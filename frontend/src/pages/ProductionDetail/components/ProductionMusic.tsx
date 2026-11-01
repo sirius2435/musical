@@ -1,0 +1,4 @@
+import { Link } from 'react-router-dom';
+import type { Entry } from '../../../objects/Entry';
+import { Label } from '../../../components/ui/ArchiveUI';
+export function ProductionMusic({ songs }: { songs: Entry[] }) { return <section className="bg-ink px-6 py-20 text-ivory"><div className="mx-auto max-w-6xl"><Label>The musical language</Label><h2 className="mb-10 text-5xl">Listen to the drama.</h2>{songs.length ? songs.map(s => <Link key={s.id} to={'/music/' + s.slug} className="flex items-center justify-between gap-5 border-t border-white/20 py-7"><div><p className="text-[9px] uppercase tracking-widest text-gold">{s.category}</p><h3 className="mt-2 text-3xl">{s.title}</h3><p className="mt-3 text-xs text-ivory/60">{s.summary}</p></div><span className="text-3xl">↗</span></Link>) : <Link to="/music" className="text-sm underline">Explore the four song functions ↗</Link>}</div></section>; }

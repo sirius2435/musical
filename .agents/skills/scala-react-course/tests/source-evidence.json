@@ -1,0 +1,148 @@
+{
+  "captured_on": "2026-11-01",
+  "scope": "Observed samples implementation, not proof of course requirements",
+  "entries": [
+    {
+      "id": "S:BORROW",
+      "workspace_path": "samples/backend-sample/src/main/scala/services/books/api/BorrowBookAPIMessage.scala",
+      "sha256": "69026a0dd85bed8d9bd6f2284079f565f0e5d4da67aabc201b2871d669ee9e49",
+      "excerpts": [
+        {
+          "start_line": 14,
+          "end_line": 36,
+          "text": "final case class BorrowBookAPIMessage(\n  userId: UserId,\n  bookId: BookId,\n  readerName: String\n) extends APIWithTokenMessage[BorrowRecord]:\n\n  override def plan(connection: Connection): IO[BorrowRecord] =\n    for\n      user <- GetCurrentUserAPIMessage(userId).plan(connection)\n      cleanReaderName = Option(readerName).map(_.trim).filter(_.nonEmpty).getOrElse(user.username)\n      book <- BookTable.lockById(connection, bookId).flatMap {\n        case Some(book) => IO.pure(book)\n        case None => IO.raiseError(HttpError.NotFound(\"图书不存在。\"))\n      }\n      _ <-\n        if book.stockAvailable > 0 then IO.unit\n        else IO.raiseError(HttpError.Conflict(\"当前图书库存不足，无法完成借书。\"))\n      decremented <- BookTable.decrementAvailable(connection, bookId)\n      _ <-\n        if decremented then IO.unit\n        else IO.raiseError(HttpError.Conflict(\"当前图书库存不足，无法完成借书。\"))\n      record <- BorrowRecordTable.insert(connection, book, cleanReaderName)\n    yield record"
+        }
+      ]
+    },
+    {
+      "id": "S:BOOK-ID",
+      "workspace_path": "samples/backend-sample/src/main/scala/services/books/objects/BookId.scala",
+      "sha256": "9fed5d306e04b3e4637c9e7baae32c4ccdf1984f8e3a5bd1160706b6e73e8d33",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 14,
+          "text": "package services.books.objects\n\nimport io.circe.{Decoder, Encoder}\n\nimport java.util.UUID\nimport scala.util.Try\n\nfinal case class BookId(value: UUID)\n\nobject BookId:\n  given Encoder[BookId] = Encoder.encodeString.contramap(_.value.toString)\n  given Decoder[BookId] = Decoder.decodeString.emap { value =>\n    Try(UUID.fromString(value)).toEither.left.map(_.getMessage).map(BookId(_))\n  }"
+        }
+      ]
+    },
+    {
+      "id": "S:BOOK-SAVE",
+      "workspace_path": "samples/backend-sample/src/main/scala/services/books/objects/BookSaveData.scala",
+      "sha256": "b874c6691d2f4d6835d10ea7544c08a81d61b1982d23b1a740037cf0a6bc63fd",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 10,
+          "text": "package services.books.objects\n\nfinal case class BookSaveData(\n  title: String,\n  author: String,\n  isbn: String,\n  category: String,\n  stock: Int,\n  summary: String\n)"
+        }
+      ]
+    },
+    {
+      "id": "S:BOOK-TABLE",
+      "workspace_path": "samples/backend-sample/src/main/scala/services/books/tables/book/BookTable.scala",
+      "sha256": "b2bff1c01fee59e00f9d9a31129d5c62fa559cda0bbecb560b32767927fe259a",
+      "excerpts": [
+        {
+          "start_line": 14,
+          "end_line": 38,
+          "text": "      |insert into books (id, title, author, isbn, category, stock_total, stock_available, summary, created_at, updated_at)\n      |values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n      |returning id, title, author, isbn, category, stock_total, stock_available, summary, created_at, updated_at\n      |\"\"\".stripMargin\n\n  private[books] def insert(connection: Connection, request: BookSaveData): IO[BookRecord] =\n    IO.blocking {\n      val statement = connection.prepareStatement(insertSql)\n      try\n        val now = Instant.now()\n        statement.setObject(1, UUID.randomUUID())\n        bindSaveFields(statement, 2, request)\n        statement.setInt(6, request.stock)\n        statement.setInt(7, request.stock)\n        statement.setString(8, request.summary.trim)\n        statement.setTimestamp(9, Timestamp.from(now))\n        statement.setTimestamp(10, Timestamp.from(now))\n\n        val resultSet = statement.executeQuery()\n        try\n          if resultSet.next() then readBook(resultSet)\n          else throw new IllegalStateException(\"Book insert returned no row\")\n        finally resultSet.close()\n      finally statement.close()\n    }"
+        },
+        {
+          "start_line": 220,
+          "end_line": 225,
+          "text": "\n  private def readBooks(resultSet: ResultSet): List[BookRecord] =\n    val builder = List.newBuilder[BookRecord]\n    while resultSet.next() do builder += readBook(resultSet)\n    builder.result()\n"
+        }
+      ]
+    },
+    {
+      "id": "S:SESSION",
+      "workspace_path": "samples/backend-sample/src/main/scala/system/DatabaseSession.scala",
+      "sha256": "14126a53fd98259176751445c5f5f5af58ef871f31e2b9c238351b2e6bedd32b",
+      "excerpts": [
+        {
+          "start_line": 16,
+          "end_line": 20,
+          "text": "  def initialize: Resource[IO, Unit] =\n    for\n      dataSource <- Resource.make(createDataSource)(closeDataSource)\n      _ <- Resource.make(register(dataSource))(_ => clearRegistration)\n    yield ()"
+        },
+        {
+          "start_line": 57,
+          "end_line": 75,
+          "text": "  private def pooledConnectionResource: Resource[IO, Connection] =\n    Resource.make {\n      dataSourceOrFail.flatMap(dataSource =>\n        IO.blocking(dataSource.getConnection)\n      )\n    } { connection =>\n      IO.blocking(connection.close()).handleErrorWith(_ => IO.unit)\n    }\n\n  def withTransactionConnection[A](operation: Connection => IO[A]): IO[A] =\n    pooledConnectionResource.use { connection =>\n      for\n        _ <- IO.blocking(connection.setAutoCommit(false))\n        result <- operation(connection).attempt\n        _ <- result match\n          case Right(_) => IO.blocking(connection.commit())\n          case Left(_) => IO.blocking(connection.rollback()).handleErrorWith(_ => IO.unit)\n        value <- IO.fromEither(result)\n      yield value"
+        }
+      ]
+    },
+    {
+      "id": "S:API-BASE",
+      "workspace_path": "samples/backend-sample/src/main/scala/system/api/APIMessage.scala",
+      "sha256": "b7bafa5fdfdb03e8af559b5cdaece3201e42dff32b155a2311e103503d513bf2",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 30,
+          "text": "package system.api\n\nimport cats.effect.IO\nimport io.circe.{Decoder, Encoder, Json}\nimport io.circe.syntax.*\nimport system.HttpError\n\nimport java.sql.Connection\nimport scala.reflect.ClassTag\n\ntrait APIMessage[Response]:\n  def plan(connection: Connection): IO[Response]\n\ntrait APIWithTokenMessage[Response] extends APIMessage[Response]\n\ntrait NoRequestMessage[Response] extends APIMessage[Response]\n\nfinal case class RegisteredAPIMessage(\n  apiName: String,\n  requiresUserToken: Boolean,\n  planJson: (Json, Connection) => IO[Json]\n)\n\nobject APIMessage:\n\n  private[api] def apiNameFromClassName(className: String): String =\n    val objectName = className.stripSuffix(\"$\")\n    val baseName = objectName.stripSuffix(\"APIMessage\")\n    s\"${baseName}API\".toLowerCase\n"
+        }
+      ]
+    },
+    {
+      "id": "S:FRONT-HOOK",
+      "workspace_path": "samples/frontend-sample/src/pages/BookList/hooks/useBookList.ts",
+      "sha256": "72f17d6d67bfe55b9757d0d5b2b40c412bf62ca926182b56e6381f2c88a594e1",
+      "excerpts": [
+        {
+          "start_line": 26,
+          "end_line": 67,
+          "text": "export function useBookList(): BookListState {\n  const navigate = useNavigate()\n  const [searchParams] = useSearchParams()\n\n  const [books, setBooks] = useState<BookCatalogRecord[]>([])\n  const [keyword, setKeyword] = useState('')\n  const [inlineMessage, setInlineMessage] = useState('')\n  const [isLoading, setIsLoading] = useState(false)\n\n  const highlightedId = searchParams.get('highlight')\n\n  const loadBooks = async () => {\n    setIsLoading(true)\n    try {\n      const response = await sendAPI(new ListBooksAPI())\n      setBooks(response.books.map(toBookCatalogRecord))\n      setInlineMessage('')\n    } catch (error) {\n      setInlineMessage(error instanceof Error ? error.message : '图书列表加载失败，请稍后重试。')\n    } finally {\n      setIsLoading(false)\n    }\n  }\n\n  useEffect(() => {\n    void loadBooks()\n  }, [])\n\n  const filteredBooks = useMemo(() => {\n    const trimmedKeyword = keyword.trim().toLowerCase()\n\n    if (!trimmedKeyword) {\n      return books\n    }\n\n    return books.filter((book) =>\n      [book.title, book.author, book.categoryLabel, book.isbn, book.id]\n        .join(' ')\n        .toLowerCase()\n        .includes(trimmedKeyword),\n    )\n  }, [books, keyword])"
+        }
+      ]
+    },
+    {
+      "id": "S:FRONT-PAGE",
+      "workspace_path": "samples/frontend-sample/src/pages/BookList/index.tsx",
+      "sha256": "0315ed3fc0f975624f6305b5dd18cc49570cf55dbc685f54519b1977d4ab8136",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 61,
+          "text": "import { LibraryBig, Plus, RotateCw } from 'lucide-react'\n\nimport { Button } from '@/components/ui/button'\n\nimport { BookListCard } from './components/BookListCard'\nimport { useBookList } from './hooks/useBookList'\n\nexport default function BookList() {\n  const list = useBookList()\n\n  return (\n    <main className=\"relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,rgba(185,208,255,0.36),transparent_36%),linear-gradient(180deg,#f5f7fb_0%,#eef2f7_48%,#e8edf4_100%)]\">\n      <div className=\"absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.56),transparent_42%,rgba(15,23,42,0.04)_100%)]\" />\n      <div className=\"absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.12),transparent_70%)] opacity-70\" />\n\n      <section className=\"relative mx-auto flex min-h-screen w-full max-w-7xl px-6 py-16 sm:px-8 lg:px-12\">\n        <div className=\"w-full space-y-8\">\n          <div className=\"flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between\">\n            <div className=\"max-w-xl space-y-4\">\n              <div className=\"inline-flex items-center gap-3 rounded-full border border-white/70 bg-white/75 px-4 py-2 text-sm text-slate-600 shadow-[0_12px_30px_rgba(15,23,42,0.08)] backdrop-blur\">\n                <LibraryBig className=\"size-4 text-slate-700\" />\n                图书管理\n              </div>\n              <div className=\"space-y-3\">\n                <h1 className=\"text-4xl font-semibold tracking-tight text-slate-900\">\n                  图书列表与管理\n                </h1>\n                <p className=\"text-base leading-7 text-slate-600\">\n                  查看馆藏图书，并通过正式页面继续完成新增、编辑、借书和还书流程。\n                </p>\n              </div>\n            </div>\n\n            <div className=\"flex flex-col gap-3 sm:flex-row\">\n              <Button\n                type=\"button\"\n                variant=\"outline\"\n                className=\"h-11 rounded-xl border-white/70 bg-white/80 px-5 text-slate-700 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur\"\n                onClick={() => void list.loadBooks()}\n                disabled={list.isLoading}\n              >\n                <RotateCw className=\"mr-2 size-4\" />\n                {list.isLoading ? '加载中...' : '刷新列表'}\n              </Button>\n              <Button\n                type=\"button\"\n                className=\"h-11 rounded-xl bg-slate-900 px-5 text-white shadow-[0_16px_40px_rgba(15,23,42,0.18)] hover:bg-slate-800\"\n                onClick={list.goToAddBook}\n              >\n                <Plus className=\"mr-2 size-4\" />\n                添加图书\n              </Button>\n            </div>\n          </div>\n\n          <BookListCard list={list} />\n        </div>\n      </section>\n    </main>\n  )\n}"
+        }
+      ]
+    },
+    {
+      "id": "S:FRONT-API",
+      "workspace_path": "samples/frontend-sample/src/apis/books/GetBookAPI.ts",
+      "sha256": "d4a614e6c0f76022c0804392d41c4e2e515a2723ac0114e565449eae494e2a14",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 11,
+          "text": "import { APIMessage } from '@/system/api/APIMessage'\nimport type { BookRecord } from '@/objects/books/BookRecord'\n\nexport class GetBookAPI extends APIMessage<BookRecord> {\n  readonly bookId: string\n\n  constructor(bookId: string) {\n    super()\n    this.bookId = bookId\n  }\n}"
+        }
+      ]
+    },
+    {
+      "id": "S:ZUSTAND",
+      "workspace_path": "samples/20_2026403036_陈柏聪_3998/Ts_project/frontend/src/pages/shared/auth/session-store.ts",
+      "sha256": "410c54e55a852bc7370fbc3d09240595f788d34948d324e20de1d8f23f6a0f45",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 29,
+          "text": "import { createStore } from 'zustand'\nimport { useStore } from 'zustand'\n\nimport type { User } from '@/objects/identity'\n\ntype SessionState = {\n  isAuthenticated: boolean\n  user?: User\n}\n\ntype SessionStore = SessionState & {\n  setSession: (session: SessionState) => void\n  clearSession: () => void\n}\n\nconst sessionStore = createStore<SessionStore>()((set) => ({\n  isAuthenticated: false,\n  user: undefined,\n  setSession: (session) => set(session),\n  clearSession: () => set({ isAuthenticated: false, user: undefined }),\n}))\n\nexport const useSession = <T,>(selector: (state: SessionStore) => T) =>\n  useStore(sessionStore, selector)\n\nexport const setSession = (user: User) =>\n  sessionStore.getState().setSession({ isAuthenticated: true, user })\n\nexport const clearSession = () => sessionStore.getState().clearSession()"
+        }
+      ]
+    },
+    {
+      "id": "S:REAL-PAGE",
+      "workspace_path": "samples/20_2026403036_陈柏聪_3998/Ts_project/frontend/src/pages/ListingDetailPage/index.tsx",
+      "sha256": "be6602eaf9eecf4c276ea3c9182aea1e7f791ca80b2ce76e5b436d30561abb84",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 54,
+          "text": "import { ListingDetailRegion } from '@/pages/ListingDetailPage/components/ListingDetailRegion'\nimport { ListingDetailSectionRail } from '@/pages/ListingDetailPage/components/ListingDetailSectionRail'\nimport { useListingDetailPage } from '@/pages/ListingDetailPage/hooks/use-listing-detail-page'\n\nexport default function ListingDetailPage() {\n  const page = useListingDetailPage()\n\n  if (page.error) {\n    return (\n      <div className=\"mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8\">\n        <div className=\"rounded-[32px] bg-white p-8 text-center text-sm text-slate-500 shadow-[0_20px_60px_rgba(15,23,42,0.05)] ring-1 ring-slate-200/80\">\n          {page.error}\n        </div>\n      </div>\n    )\n  }\n\n  if (page.isLoading || !page.listing) {\n    return (\n      <div className=\"mx-auto max-w-7xl px-4 py-16 text-sm text-slate-500 sm:px-6 lg:px-8\">\n        Loading property details...\n      </div>\n    )\n  }\n\n  return (\n    <div className=\"min-h-[calc(100vh-81px)] bg-[radial-gradient(circle_at_18%_12%,rgba(147,197,253,0.36),transparent_34%),radial-gradient(circle_at_82%_8%,rgba(186,230,253,0.42),transparent_30%),linear-gradient(180deg,#eff6ff_0%,#eaf3ff_48%,#f5f9ff_100%)] px-4 pt-4 pb-4 sm:px-6 lg:px-8\">\n      <div className=\"flex min-h-0 flex-col gap-4 pt-9 pb-1 lg:h-[calc(100vh-8.5rem)] lg:flex-row\">\n        <aside className=\"shrink-0\">\n          <ListingDetailSectionRail\n            activeSection={page.activeSection}\n            onSelect={page.setActiveSection}\n          />\n        </aside>\n\n        <main className=\"min-w-0 flex-1\">\n          <ListingDetailRegion\n            activeImageIndex={page.activeImageIndex}\n            activeSection={page.activeSection}\n            handleTypingChange={page.handleTypingChange}\n            listing={page.listing}\n            locationState={page.locationState}\n            messaging={page.messaging}\n            onImageChange={page.setActiveImageIndex}\n            onToggleSave={page.toggleSaved}\n            savedIds={page.savedIds}\n            isAuthenticated={page.isAuthenticated}\n            user={page.user}\n          />\n        </main>\n      </div>\n    </div>\n  )\n}"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "status": "Source inventory for implemented archive seed; local images now use licensed Wikimedia Commons files with recorded provenance.",
+  "accessed": "2026-11-01",
+  "course_materials": "No musical theatre lecture originals were present in musical at inspection. Do not claim verification of course slides.",
+  "productions": [
+    {
+      "slug": "carousel",
+      "title": "Carousel",
+      "originalBroadwayYear": 1945,
+      "yearMeaning": "Original Broadway opening; not necessarily earliest world premiere",
+      "source": "https://www.ibdb.com/broadway-production/carousel-1694",
+      "supportedFields": [
+        "title",
+        "originalBroadwayYear",
+        "source credits and short original synopsis checked against licensing/official show resource; interpretation remains editorial"
+      ],
+      "image": "/images/productions/carousel-1945.webp",
+      "imageRights": "Public domain; local licensed copy from Wikimedia Commons. See IMAGE_ATTRIBUTIONS.md.",
+      "synopsisSource": "https://www.concordtheatricals.com/p/44804/rodgers-hammersteins-carousel",
+      "imageSource": "https://commons.wikimedia.org/wiki/File:Use_of_Wondering.jpg"
+    },
+    {
+      "slug": "south-pacific",
+      "title": "South Pacific",
+      "originalBroadwayYear": 1949,
+      "yearMeaning": "Original Broadway opening; not necessarily earliest world premiere",
+      "source": "https://www.ibdb.com/broadway-production/south-pacific-1831",
+      "supportedFields": [
+        "title",
+        "originalBroadwayYear",
+        "source credits and short original synopsis checked against licensing/official show resource; interpretation remains editorial"
+      ],
+      "image": "/images/productions/south-pacific-1949.webp",
+      "imageRights": "Public domain; local licensed copy from Wikimedia Commons. See IMAGE_ATTRIBUTIONS.md.",
+      "synopsisSource": "https://rodgersandhammerstein.com/south-pacific-synopsis/",
+      "imageSource": "https://commons.wikimedia.org/wiki/File:South_Pacific_Playbill.jpg"
+    },
+    {
+      "slug": "the-king-and-i",
+      "title": "The King and I",
+      "originalBroadwayYear": 1951,
+      "yearMeaning": "Original Broadway opening; not necessarily earliest world premiere",
+      "source": "https://www.ibdb.com/broadway-production/the-king-and-i-1935",
+      "supportedFields": [
+        "title",
+        "originalBroadwayYear",
+        "source credits and short original synopsis checked against licensing/official show resource; interpretation remains editorial"
+      ],
+      "image": "/images/productions/the-king-and-i-1951.webp",
+      "imageRights": "Public domain; local licensed copy from Wikimedia Commons. See IMAGE_ATTRIBUTIONS.md.",
+      "synopsisSource": "https://rodgersandhammerstein.com/the-king-and-i-synopsis/",
+      "imageSource": "https://commons.wikimedia.org/wiki/File:Brynner_the_King.jpg"
+    },
+    {
+      "slug": "oklahoma",
+      "title": "Oklahoma!",
+      "originalBroadwayYear": 1943,
+      "yearMeaning": "Original Broadway opening; not necessarily earliest world premiere",
+      "source": "https://www.ibdb.com/broadway-production/oklahoma-1285",
+      "supportedFields": [
+        "title",
+        "originalBroadwayYear",
+        "source credits and short original synopsis checked against licensing/official show resource; interpretation remains editorial"
+      ],
+      "image": "/images/productions/oklahoma-1943.webp",
+      "imageRights": "Public domain; local licensed copy from Wikimedia Commons. See IMAGE_ATTRIBUTIONS.md.",
+      "synopsisSource": "https://rodgersandhammerstein.com/oklahoma-synopsis/",
+      "imageSource": "https://commons.wikimedia.org/wiki/File:John_Raitt_in_Oklahoma_still.jpg"
+    },
+    {
+      "slug": "my-fair-lady",
+      "title": "My Fair Lady",
+      "originalBroadwayYear": 1956,
+      "yearMeaning": "Original Broadway opening; not necessarily earliest world premiere",
+      "source": "https://www.ibdb.com/broadway-production/my-fair-lady-2407",
+      "supportedFields": [
+        "title",
+        "originalBroadwayYear",
+        "source credits and short original synopsis checked against licensing/official show resource; interpretation remains editorial"
+      ],
+      "image": "/images/productions/my-fair-lady-1956.webp",
+      "imageRights": "Public domain; local licensed copy from Wikimedia Commons. See IMAGE_ATTRIBUTIONS.md.",
+      "synopsisSource": "https://www.mtishows.com/my-fair-lady-0",
+      "imageSource": "https://commons.wikimedia.org/wiki/File:MusicalTheater3.jpg"
+    },
+    {
+      "slug": "west-side-story",
+      "title": "West Side Story",
+      "originalBroadwayYear": 1957,
+      "yearMeaning": "Original Broadway opening; not necessarily earliest world premiere",
+      "source": "https://www.ibdb.com/broadway-production/west-side-story-2639",
+      "supportedFields": [
+        "title",
+        "originalBroadwayYear",
+        "source credits and short original synopsis checked against licensing/official show resource; interpretation remains editorial"
+      ],
+      "image": "/images/productions/west-side-story-1957.webp",
+      "imageRights": "Public domain; local licensed copy from Wikimedia Commons. See IMAGE_ATTRIBUTIONS.md.",
+      "synopsisSource": "https://www.mtishows.com/west-side-story",
+      "imageSource": "https://commons.wikimedia.org/wiki/File:West_Side_Story_1958_poster_ppmsca.15732.jpg"
+    },
+    {
+      "slug": "hair",
+      "title": "Hair",
+      "originalBroadwayYear": 1968,
+      "yearMeaning": "Original Broadway opening; not necessarily earliest world premiere",
+      "source": "https://www.ibdb.com/broadway-production/hair-3393",
+      "supportedFields": [
+        "title",
+        "originalBroadwayYear",
+        "source credits and short original synopsis checked against licensing/official show resource; interpretation remains editorial"
+      ],
+      "image": "/images/productions/hair-1968.webp",
+      "imageRights": "Public domain; local licensed copy from Wikimedia Commons. See IMAGE_ATTRIBUTIONS.md.",
+      "synopsisSource": "https://www.concordtheatricals.com/p/44626/hair",
+      "imageSource": "https://commons.wikimedia.org/wiki/File:Heather_MacRae_in_Hair.jpg"
+    },
+    {
+      "slug": "grease",
+      "title": "Grease",
+      "originalBroadwayYear": 1972,
+      "yearMeaning": "Original Broadway opening; not necessarily earliest world premiere",
+      "source": "https://www.ibdb.com/broadway-production/grease-3641",
+      "supportedFields": [
+        "title",
+        "originalBroadwayYear",
+        "source credits and short original synopsis checked against licensing/official show resource; interpretation remains editorial"
+      ],
+      "image": "/images/productions/grease-1972.webp",
+      "imageRights": "CC BY-SA 4.0; local licensed copy from Wikimedia Commons. See IMAGE_ATTRIBUTIONS.md. This is a 2014 Muny production photograph, not the original 1972 staging.",
+      "synopsisSource": "https://www.concordtheatricals.com/p/2155/grease",
+      "imageSource": "https://commons.wikimedia.org/wiki/File:Grease_Muny_2014.jpg"
+    }
+  ],
+  "contextSources": [
+    {
+      "url": "https://nmaahc.si.edu/explore/stories/blackface-birth-american-stereotype",
+      "publisher": "Smithsonian NMAAHC",
+      "purpose": "Critical historical context for racism and blackface; not an entertainment endorsement."
+    },
+    {
+      "url": "https://www.loc.gov/collections/songs-of-america/articles-and-essays/musical-styles/popular-songs-of-the-day/minstrel-songs/",
+      "publisher": "Library of Congress",
+      "purpose": "History and changing structure; avoid a single unqualified structural claim across all periods."
+    },
+    {
+      "url": "https://www.concordtheatricals.com/p/44804/rodgers-hammersteins-carousel",
+      "publisher": "Concord Theatricals",
+      "purpose": "Song list and dramatic context for If I Loved You and Soliloquy; not permission to reproduce lyrics or audio."
+    }
+  ],
+  "editorialNotes": [
+    "Treat five eras as curated teaching lenses with overlaps, not a strict mutually exclusive taxonomy.",
+    "Differentiate Hair counterculture and Grease retrospective high-school setting.",
+    "Interpretive song-function labels from user brief are editorial analysis, not exclusive authoritative song classifications."
+  ]
+}

@@ -1,0 +1,2 @@
+import { Label, ArrowLink } from '../../../components/ui/ArchiveUI';
+export function BehindStage() { return <section className="relative bg-ivory px-6 py-28 text-center"><Label>Behind the performance</Label><h2 className="text-5xl md:text-7xl">A world built<br /><span className="italic">beyond the spotlight.</span></h2><p className="my-8 text-xs tracking-[.25em]">BOOK · MUSIC · DANCE · STAGE</p><ArrowLink to="/stagecraft">Explore stagecraft</ArrowLink></section>; }

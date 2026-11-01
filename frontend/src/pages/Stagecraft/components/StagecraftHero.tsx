@@ -1,0 +1,2 @@
+import { Label } from '../../../components/ui/ArchiveUI';
+export function StagecraftHero() { return <section className="mx-auto max-w-7xl px-6 py-20 md:px-12"><Label>Behind the stage</Label><h1 className="max-w-4xl text-6xl leading-[.95] md:text-8xl">The art behind<br /><span className="italic text-gold">the performance.</span></h1><p className="mt-8 max-w-xl text-sm leading-8 text-ivory/60">A musical is built from more than its performers. Explore the many crafts that make a single moment possible.</p></section>; }

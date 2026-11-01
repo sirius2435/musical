@@ -1,0 +1,18 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import './index.css';
+import Home from './pages/Home';
+import History from './pages/History';
+import EraDetail from './pages/EraDetail';
+import Productions from './pages/Productions';
+import ProductionDetail from './pages/ProductionDetail';
+import Music from './pages/Music';
+import SongDetail from './pages/SongDetail';
+import Stagecraft from './pages/Stagecraft';
+import Auth from './pages/Auth';
+import Account from './pages/Account';
+import Admin from './pages/Admin';
+import About from './pages/About';
+import { Layout } from './Layout';
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><BrowserRouter><Routes><Route element={<Layout />}><Route index element={<Home />}/><Route path="history" element={<History />}/><Route path="history/:slug" element={<EraDetail />}/><Route path="productions" element={<Productions />}/><Route path="productions/:slug" element={<ProductionDetail />}/><Route path="music" element={<Music />}/><Route path="music/:slug" element={<SongDetail />}/><Route path="stagecraft" element={<Stagecraft />}/><Route path="auth" element={<Auth />}/><Route path="account" element={<Account />}/><Route path="admin" element={<Admin />}/><Route path="about" element={<About />}/><Route path="*" element={<main className="p-20"><h1 className="text-6xl">This story isn’t here.</h1><Link to="/">Return to the stage ↗</Link></main>}/></Route></Routes></BrowserRouter></React.StrictMode>);
